@@ -3,13 +3,15 @@
 #include <vector>
 #include <array>
 #include <list>
+#include <deque>
 #include <cstdlib> 
 #include <ctime>   
+#include <execution>
 #include "BounceBall.h"
 
 
 
-void SpawnBall(size_t size, std::list<BounceBall>& arrayBall) {
+void SpawnBall(size_t size, std::deque<BounceBall>& arrayBall) {
     for (size_t i = 0; i < size; i++) {
         BounceBall ball;
 
@@ -30,34 +32,44 @@ void SpawnBall(size_t size, std::list<BounceBall>& arrayBall) {
     }
 }
 
-void Update(std::list<BounceBall>& ball, sf::VertexArray& particles) {
+void Update(std::deque<BounceBall>& ball, sf::VertexArray& particles) {
     int i = 0;
     for (BounceBall& temp : ball) {
-        sf::Vector2f pos = temp.GetShape().getPosition();
-        sf::Vector2f size = temp.GetShape().getSize();
-        sf::Color color = temp.GetShape().getFillColor();
+        const sf::RectangleShape& shape = temp.GetShape();
+        const sf::Vector2f& pos = shape.getPosition();
+        const sf::Vector2f& size = shape.getSize();
+        const sf::Color& color = shape.getFillColor();
 
-        particles[i * 6 + 0].position = pos;                      
-        particles[i * 6 + 1].position = pos + sf::Vector2f(size.x, 0);  
-        particles[i * 6 + 2].position = pos + sf::Vector2f(size.x, size.y); 
 
-        particles[i * 6 + 3].position = pos;
-        particles[i * 6 + 4].position = pos + sf::Vector2f(size.x, size.y);
-        particles[i * 6 + 5].position = pos + sf::Vector2f(0, size.y);
+        int baseIndex = i * 6;
+        sf::Vertex* v = &particles[baseIndex];  
 
-        for (int j = 0; j < 6;j++) {
-            particles[i * 6 + j].color = color;
+        
+        v[0].position = pos;
+        v[1].position = pos + sf::Vector2f(size.x, 0);
+        v[2].position = pos + sf::Vector2f(size.x, size.y);
+
+        
+        v[3].position = pos;
+        v[4].position = pos + sf::Vector2f(size.x, size.y);
+        v[5].position = pos + sf::Vector2f(0, size.y);
+
+
+        for (int j = 0; j < 6; j++) {
+            v[j].color = color;
         }
+
         i++;
     }
 }
 
+
 int main()
 {
-    size_t size = 40000;
+    size_t size = 200000;
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "caca");
     sf::Clock clock;
     sf::VertexArray particles(sf::PrimitiveType::Triangles, 6 * size);
     sf::Font font;
@@ -72,7 +84,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    std::list<BounceBall> mBall;
+    std::deque<BounceBall> mBall;
     SpawnBall(size, mBall);
 
 
@@ -81,9 +93,10 @@ int main()
         float deltaTime = clock.restart().asSeconds();
 
 
-        for (BounceBall& ball : mBall) {
+        std::for_each(std::execution::par_unseq, mBall.begin(), mBall.end(), [&](BounceBall& ball) {
             ball.Update(deltaTime);
-        }
+            });
+
         Update(mBall, particles);
         
         int fps = static_cast<int>(1.0f / deltaTime);
@@ -95,9 +108,6 @@ int main()
         window.draw(particles);
         window.draw(fpsText);
 
-
         window.display();
-
-
     }
 }
