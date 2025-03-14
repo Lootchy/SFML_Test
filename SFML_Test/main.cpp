@@ -8,27 +8,38 @@
 #include <ctime>   
 #include <execution>
 #include "BounceBall.h"
+#include "Entity.h"
 
 
 
-void SpawnBall(size_t size, std::deque<BounceBall>& arrayBall) {
+void SpawnEntity(size_t size, Manager& manager, Entity::ShapeType shapeType) {
     for (size_t i = 0; i < size; i++) {
-        BounceBall ball;
+        // Créer une entité avec la forme spécifiée
+        Entity* entity = nullptr;
 
-        float randomX = static_cast<float>(std::rand() % 750);
-        float randomY = static_cast<float>(std::rand() % 550);
-        ball.SetPosition(randomX, randomY);
+        if (shapeType == Entity::ShapeType::RECTANGLE) {
+            // Créer un rectangle
+            entity = manager.CreateEntity<sf::RectangleShape>(shapeType, sf::Vector2f(10.f, 10.f)); // Taille par défaut
+        }
+        else if (shapeType == Entity::ShapeType::CIRCLE) {
+            // Créer un cercle
+            entity = manager.CreateEntity<sf::CircleShape>(shapeType, 25.f); // Rayon par défaut
+        }
 
-        ball.SetBounciness(1.0f);
-        sf::Color randomColor(
-            static_cast<int>(std::rand() % 256),
-            static_cast<int>(std::rand() % 256),
-            static_cast<int>(std::rand() % 256)
-        );
-        ball.SetColor(randomColor);
+        if (entity) {
+            // Position aléatoire
+            float randomX = static_cast<float>(std::rand() % 750);
+            float randomY = static_cast<float>(std::rand() % 550);
+            entity->SetPosition(randomX, randomY);
 
-        // Affectation de la balle dans le tableau
-        arrayBall.push_back(ball);
+            // Couleur aléatoire
+            sf::Color randomColor(
+                static_cast<int>(std::rand() % 256),
+                static_cast<int>(std::rand() % 256),
+                static_cast<int>(std::rand() % 256)
+            );
+            entity->SetColor(randomColor);
+        }
     }
 }
 
@@ -66,48 +77,39 @@ void Update(std::deque<BounceBall>& ball, sf::VertexArray& particles) {
 
 int main()
 {
-    size_t size = 200000;
+    Manager manager;
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "caca");
     sf::Clock clock;
-    sf::VertexArray particles(sf::PrimitiveType::Triangles, 6 * size);
     sf::Font font;
-    if (!font.openFromFile("Bebas-Regular.ttf"))
-    {
-        std::cerr << "Erreur de chargement de la police" << std::endl;
-        return -1;
-    }
+    font.openFromFile("Bebas-Regular.ttf");
+
 
     sf::Text fpsText(font);
     fpsText.setCharacterSize(24);
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    std::deque<BounceBall> mBall;
-    SpawnBall(size, mBall);
+    SpawnEntity(10000, manager, Entity::ShapeType::RECTANGLE);
 
 
     while (window.isOpen())
     {
         float deltaTime = clock.restart().asSeconds();
 
-
-        std::for_each(std::execution::par_unseq, mBall.begin(), mBall.end(), [&](BounceBall& ball) {
-            ball.Update(deltaTime);
-            });
-
-        Update(mBall, particles);
+        manager.Update(deltaTime);
         
         int fps = static_cast<int>(1.0f / deltaTime);
 
         fpsText.setString("FPS: " + std::to_string(fps));
 
         window.clear();
-
-        window.draw(particles);
+        manager.Draw(window);
         window.draw(fpsText);
 
         window.display();
+
+ 
     }
 }
