@@ -107,7 +107,6 @@ void Manager::Draw(sf::RenderWindow& window)
             }
         }
     }
-
     window.draw(vertexArray);
 }
 

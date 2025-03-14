@@ -44,6 +44,7 @@ public:
 
 	sf::Shape& GetShape() { return *mShape; }
 	sf::RectangleShape* GetRectangleShape() { return mRectShape; }
+	sf::Vector2f GetPosition()const { return mShape->getPosition(); }
 
 	uint32_t GetEntityId()const { return mId; }
 
