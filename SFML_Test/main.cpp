@@ -12,20 +12,20 @@
 
 
 
-void SpawnEntity(size_t size, Manager& manager, Entity::ShapeType shapeType) {
-    sf::Texture texture("C:\\Users\\zian\\Downloads\\dirt.jpg");
+void SpawnEntity(size_t size, Manager& manager) {
+    sf::Texture texture;
+    if (!texture.loadFromFile("C:\\Users\\zian\\Downloads\\dirt.jpg")) {
+        std::cerr << "Erreur: Impossible de charger la texture" << std::endl;
+    }
+
     for (size_t i = 0; i < size; i++) {
         // Créer une entité avec la forme spécifiée
         Entity* entity = nullptr;
 
-        if (shapeType == Entity::ShapeType::RECTANGLE) {
-            // Créer un rectangle
-            entity = manager.CreateEntity<sf::RectangleShape>(shapeType, texture,sf::Vector2f(50.f, 50.f)); // Taille par défaut
-        }
-        else if (shapeType == Entity::ShapeType::CIRCLE) {
-            // Créer un cercle
-            entity = manager.CreateEntity<sf::CircleShape>(shapeType, texture, 25.f); // Rayon par défaut
-        }
+
+        entity = manager.CreateEntity(texture,sf::Vector2f(50.f, 50.f));
+        
+
 
         if (entity) {
             // Position aléatoire
@@ -33,13 +33,7 @@ void SpawnEntity(size_t size, Manager& manager, Entity::ShapeType shapeType) {
             float randomY = static_cast<float>(std::rand() % 550);
             entity->SetPosition(randomX, randomY);
 
-            // Couleur aléatoire
-            sf::Color randomColor(
-                static_cast<int>(std::rand() % 256),
-                static_cast<int>(std::rand() % 256),
-                static_cast<int>(std::rand() % 256)
-            );
-            entity->SetColor(randomColor);
+            entity->SetSize(50.0f, 50.0f);
         }
     }
 }
@@ -92,7 +86,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(1, manager, Entity::ShapeType::RECTANGLE);
+    SpawnEntity(1, manager);
 
 
     while (window.isOpen())

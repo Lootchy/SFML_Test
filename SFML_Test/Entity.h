@@ -6,12 +6,6 @@
 
 class Entity
 {
-public:
-	enum class ShapeType {
-		RECTANGLE,
-		CIRCLE
-	};
-
 private:
 	static uint32_t sNextId;
 
@@ -23,24 +17,17 @@ private:
 
 
 public:
-	Entity(sf::Shape* shape, ShapeType type, const sf::Texture& texture)
-		: mId(sNextId++), mShapeGeometry(type), mSprite(texture)
+	Entity(const sf::Texture& texture)
+		: mId(sNextId++), mSprite(texture)
 	{
-		if (type == ShapeType::RECTANGLE) {
-			
-			SetTexture(texture);
-		}
+		SetTexture(texture);
 	}
 
-	Entity(ShapeType type, const sf::Texture& texture)
-		: mId(sNextId++), mShapeGeometry(type), mSprite(texture)
-	{
-	}
+
 
 
 	~Entity();
 
-	ShapeType mShapeGeometry;
 	virtual void Init() {}
 	virtual void Update(float deltaTime) {}
 
@@ -82,20 +69,14 @@ public:
 
 	void Refresh();
 
-	template <typename T, typename... Args>
-	Entity* CreateEntity(Entity::ShapeType type, const sf::Texture& texture, Args&&... args) {
-		static_assert(std::is_base_of_v<sf::Shape, T> || std::is_same_v<T, sf::Sprite>,
-			"T doit être une sous-classe de sf::Shape ou un sf::Sprite");
+	
+	Entity* CreateEntity(const sf::Texture& texture, sf::Vector2f size) {
+		
 
 		Entity* entity = nullptr;
 
-		if constexpr (std::is_base_of_v<sf::Shape, T>) {
-			entity = new Entity(new T(std::forward<Args>(args)...), type, texture);
-	
-		}
-		else if constexpr (std::is_same_v<T, sf::Sprite>) {
-			entity = new Entity(type, texture); // Utilisation du bon constructeur
-		}
+		
+		entity = new Entity(texture); 
 
 		if (entity) {
 			entity->Init();

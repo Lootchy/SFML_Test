@@ -7,8 +7,6 @@ uint32_t Entity::sNextId = 1;
 
 Entity::~Entity()
 {
-    delete mShape;
-    mTexture.~Texture();
 }
 
 void Entity::Destroy()
@@ -26,36 +24,15 @@ bool Entity::IsEntityDestroy() const
 
 void Entity::SetTexture(const std::string& filepath)
 {
-    if (!mRectShape) {
-        std::cerr << "Error: mRectShape is nullptr in SetTexture" << std::endl;
-        return;
-    }
 
-    int sizeX = static_cast<int>(mRectShape->getSize().x);
-    int sizeY = static_cast<int>(mRectShape->getSize().y);
-    sf::Vector2i rectPos(static_cast<int>(mRectShape->getPosition().x), static_cast<int>(mRectShape->getPosition().y));
-    sf::IntRect textureRect({ rectPos.x, rectPos.y }, { sizeX, sizeY });
-
-    if (!mTexture.loadFromFile(filepath, false, textureRect)) {
+    if (!mTexture.loadFromFile(filepath, false)) {
         std::cerr << "Error loading texture: " << filepath << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    // Appliquer la texture
-    mRectShape->setTexture(&mTexture);
-    mRectShape->setTextureRect(textureRect);
-
-
     mSprite.setTexture(mTexture);
-    mSprite.setTextureRect(textureRect);
-}
 
-void Entity::SetTexture(const sf::Texture& texture)
-{
-    mTexture = texture;
-    mSprite.setTexture(mTexture, true);
-
-    sf::Vector2f newSize = mRectShape->getSize();
+    sf::Vector2f newSize = mSprite.getLocalBounds().size;
 
     sf::Vector2f scale(
         newSize.x / static_cast<float>(mTexture.getSize().x),
@@ -63,7 +40,23 @@ void Entity::SetTexture(const sf::Texture& texture)
     );
 
     mSprite.setScale(scale);
-    mSprite.setPosition(mRectShape->getPosition());
+    mSprite.setPosition(mSprite.getPosition());
+}
+
+void Entity::SetTexture(const sf::Texture& texture)
+{
+    mTexture = texture;
+    mSprite.setTexture(mTexture, true);
+
+    sf::Vector2f newSize = mSprite.getLocalBounds().size;
+
+    sf::Vector2f scale(
+        newSize.x / static_cast<float>(mTexture.getSize().x),
+        newSize.y / static_cast<float>(mTexture.getSize().y)
+    );
+
+    mSprite.setScale(scale);
+    mSprite.setPosition(mSprite.getPosition());
 }
 
 
@@ -83,7 +76,9 @@ void Entity::SetPosition(float x, float y)
 void Entity::SetSize(float x, float y)
 {
    
-    mSprite.scale(sf::Vector2f(x, y));
+    sf::Vector2f textureSize(mTexture.getSize());
+    mSprite.setScale(sf::Vector2f(x / textureSize.x, y / textureSize.y));
+
 }
 
 
