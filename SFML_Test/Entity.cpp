@@ -8,6 +8,7 @@ uint32_t Entity::sNextId = 1;
 Entity::~Entity()
 {
     delete mShape;
+    mTexture.~Texture();
 }
 
 void Entity::Destroy()
@@ -20,29 +21,71 @@ bool Entity::IsEntityDestroy() const
     return IsDestroy;
 }
 
-void Entity::SetColor(const sf::Color& color) {
-    if (mShape)
-        mShape->setFillColor(color);
+
+
+
+void Entity::SetTexture(const std::string& filepath)
+{
+    if (!mRectShape) {
+        std::cerr << "Error: mRectShape is nullptr in SetTexture" << std::endl;
+        return;
+    }
+
+    int sizeX = static_cast<int>(mRectShape->getSize().x);
+    int sizeY = static_cast<int>(mRectShape->getSize().y);
+    sf::Vector2i rectPos(static_cast<int>(mRectShape->getPosition().x), static_cast<int>(mRectShape->getPosition().y));
+    sf::IntRect textureRect({ rectPos.x, rectPos.y }, { sizeX, sizeY });
+
+    if (!mTexture.loadFromFile(filepath, false, textureRect)) {
+        std::cerr << "Error loading texture: " << filepath << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // Appliquer la texture
+    mRectShape->setTexture(&mTexture);
+    mRectShape->setTextureRect(textureRect);
+
+
+    mSprite.setTexture(mTexture);
+    mSprite.setTextureRect(textureRect);
+}
+
+void Entity::SetTexture(const sf::Texture& texture)
+{
+    mTexture = texture;
+    mSprite.setTexture(mTexture, true);
+
+    sf::Vector2f newSize = mRectShape->getSize();
+
+    sf::Vector2f scale(
+        newSize.x / static_cast<float>(mTexture.getSize().x),
+        newSize.y / static_cast<float>(mTexture.getSize().y)
+    );
+
+    mSprite.setScale(scale);
+    mSprite.setPosition(mRectShape->getPosition());
+}
+
+
+
+
+
+void Entity::SetColor(const sf::Color& color) 
+{
+    mSprite.setColor(color);
 }
 
 void Entity::SetPosition(float x, float y)
 {
-    if (mShape) mShape->setPosition(sf::Vector2f(x, y));
+    mSprite.setPosition(sf::Vector2f(x, y));
 }
 
 void Entity::SetSize(float x, float y)
 {
-    if (auto* rect = dynamic_cast<sf::RectangleShape*>(mShape)) {
-        rect->setSize({ x, y });
-    }
+   
+    mSprite.scale(sf::Vector2f(x, y));
 }
 
-void Entity::SetSize(float size)
-{
-    if (auto* circle = dynamic_cast<sf::CircleShape*>(mShape)) {
-        circle->setRadius(size);
-    }
-}
 
 
 
@@ -70,7 +113,7 @@ void Manager::Update(float deltaTime)
 
 void Manager::Draw(sf::RenderWindow& window)
 {
-    size_t rectangleCount = 0;
+    /*size_t rectangleCount = 0;
     for (auto& e : mEntities) {
         if (e->mShapeGeometry == Entity::ShapeType::RECTANGLE) {
             rectangleCount++;
@@ -107,8 +150,16 @@ void Manager::Draw(sf::RenderWindow& window)
             }
         }
     }
-    window.draw(vertexArray);
+    window.draw(vertexArray);*/
+
+    for (auto& e : GetEntity()) {
+        if (e->HasSprite()) {
+            window.draw(e->GetSprite());
+        }
+    }
 }
+
+
 
 void Manager::Refresh()
 {

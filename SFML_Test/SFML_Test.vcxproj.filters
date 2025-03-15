@@ -38,4 +38,9 @@
       <Filter>Fichiers de ressources</Filter>
     </Font>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\zian\Downloads\dirt.jpg">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

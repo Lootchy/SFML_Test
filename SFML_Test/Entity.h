@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include <SFML/Graphics.hpp>
-
+#include <iostream>
+#include <optional>
 
 class Entity
 {
@@ -16,35 +17,49 @@ private:
 
 	bool IsDestroy = false;
 	uint32_t mId;
-	sf::Shape* mShape = nullptr;
-	sf::RectangleShape* mRectShape = nullptr;
+
+	sf::Texture mTexture;
+	sf::Sprite mSprite;
+
 
 public:
-	Entity(sf::Shape* shape, ShapeType type)
-		: mId(sNextId++), mShape(shape), mShapeGeometry(type) {
+	Entity(sf::Shape* shape, ShapeType type, const sf::Texture& texture)
+		: mId(sNextId++), mShapeGeometry(type), mSprite(texture)
+	{
 		if (type == ShapeType::RECTANGLE) {
-			mRectShape = static_cast<sf::RectangleShape*>(shape);
+			
+			SetTexture(texture);
 		}
 	}
+
+	Entity(ShapeType type, const sf::Texture& texture)
+		: mId(sNextId++), mShapeGeometry(type), mSprite(texture)
+	{
+	}
+
 
 	~Entity();
 
 	ShapeType mShapeGeometry;
 	virtual void Init() {}
-	virtual void Update(float deltaTime){}
+	virtual void Update(float deltaTime) {}
 
 	void Destroy();
 	bool IsEntityDestroy()const;
+	bool HasSprite() const { return mTexture.getSize().x > 0; }
 
-
+	void SetTexture(const std::string& filepath);
+	void SetTexture(const sf::Texture& texture);
 	void SetColor(const sf::Color& color);
 	void SetPosition(float x, float y);
 	void SetSize(float x, float y);
 	void SetSize(float size);
 
-	sf::Shape& GetShape() { return *mShape; }
-	sf::RectangleShape* GetRectangleShape() { return mRectShape; }
-	sf::Vector2f GetPosition()const { return mShape->getPosition(); }
+
+	sf::Texture& GetTexture() { return mTexture; }
+	sf::Sprite& GetSprite() { return mSprite; }
+
+	sf::Vector2f GetPosition()const { return mSprite.getPosition(); }
 
 	uint32_t GetEntityId()const { return mId; }
 
@@ -68,15 +83,29 @@ public:
 	void Refresh();
 
 	template <typename T, typename... Args>
-	Entity* CreateEntity(Entity::ShapeType type, Args&&... args) {
-		static_assert(std::is_base_of_v<sf::Shape, T>, "T doit �tre une sous-classe de sf::Shape");
+	Entity* CreateEntity(Entity::ShapeType type, const sf::Texture& texture, Args&&... args) {
+		static_assert(std::is_base_of_v<sf::Shape, T> || std::is_same_v<T, sf::Sprite>,
+			"T doit être une sous-classe de sf::Shape ou un sf::Sprite");
 
-		Entity* entity = new Entity(new T(std::forward<Args>(args)...), type);
-		entity->Init();
-		mEntities.emplace_back(entity);
+		Entity* entity = nullptr;
+
+		if constexpr (std::is_base_of_v<sf::Shape, T>) {
+			entity = new Entity(new T(std::forward<Args>(args)...), type, texture);
+	
+		}
+		else if constexpr (std::is_same_v<T, sf::Sprite>) {
+			entity = new Entity(type, texture); // Utilisation du bon constructeur
+		}
+
+		if (entity) {
+			entity->Init();
+			mEntities.emplace_back(entity);
+		}
 
 		return entity;
 	}
+
+
 
 
 	std::vector<Entity*>& GetEntity() { return mEntities; }

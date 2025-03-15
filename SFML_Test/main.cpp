@@ -13,17 +13,18 @@
 
 
 void SpawnEntity(size_t size, Manager& manager, Entity::ShapeType shapeType) {
+    sf::Texture texture("C:\\Users\\zian\\Downloads\\dirt.jpg");
     for (size_t i = 0; i < size; i++) {
         // Créer une entité avec la forme spécifiée
         Entity* entity = nullptr;
 
         if (shapeType == Entity::ShapeType::RECTANGLE) {
             // Créer un rectangle
-            entity = manager.CreateEntity<sf::RectangleShape>(shapeType, sf::Vector2f(10.f, 10.f)); // Taille par défaut
+            entity = manager.CreateEntity<sf::RectangleShape>(shapeType, texture,sf::Vector2f(50.f, 50.f)); // Taille par défaut
         }
         else if (shapeType == Entity::ShapeType::CIRCLE) {
             // Créer un cercle
-            entity = manager.CreateEntity<sf::CircleShape>(shapeType, 25.f); // Rayon par défaut
+            entity = manager.CreateEntity<sf::CircleShape>(shapeType, texture, 25.f); // Rayon par défaut
         }
 
         if (entity) {
@@ -91,7 +92,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(10000, manager, Entity::ShapeType::RECTANGLE);
+    SpawnEntity(1, manager, Entity::ShapeType::RECTANGLE);
 
 
     while (window.isOpen())
