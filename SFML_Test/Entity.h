@@ -12,7 +12,7 @@ private:
 	bool IsDestroy = false;
 	uint32_t mId;
 
-	sf::Texture mTexture;
+	const sf::Texture* mTexture = nullptr;
 	sf::Sprite mSprite;
 
 
@@ -33,17 +33,17 @@ public:
 
 	void Destroy();
 	bool IsEntityDestroy()const;
-	bool HasSprite() const { return mTexture.getSize().x > 0; }
 
 	void SetTexture(const std::string& filepath);
 	void SetTexture(const sf::Texture& texture);
 	void SetColor(const sf::Color& color);
 	void SetPosition(float x, float y);
 	void SetSize(float x, float y);
-	void SetSize(float size);
 
 
-	sf::Texture& GetTexture() { return mTexture; }
+	const sf::Texture& GetTexture() const { return *mTexture; }
+	
+
 	sf::Sprite& GetSprite() { return mSprite; }
 
 	sf::Vector2f GetPosition()const { return mSprite.getPosition(); }
@@ -79,6 +79,7 @@ public:
 		entity = new Entity(texture); 
 
 		if (entity) {
+			entity->SetSize(size.x, size.y);
 			entity->Init();
 			mEntities.emplace_back(entity);
 		}

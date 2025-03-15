@@ -9,31 +9,25 @@
 #include <execution>
 #include "BounceBall.h"
 #include "Entity.h"
-
+#include "TextureManager.h"
 
 
 void SpawnEntity(size_t size, Manager& manager) {
-    sf::Texture texture;
-    if (!texture.loadFromFile("C:\\Users\\zian\\Downloads\\dirt.jpg")) {
-        std::cerr << "Erreur: Impossible de charger la texture" << std::endl;
-    }
+    sf::Texture texture = TextureManager::GetInstance().GetTexture("C:\\Users\\zian\\Downloads\\dirt.jpg");
 
     for (size_t i = 0; i < size; i++) {
         // Créer une entité avec la forme spécifiée
         Entity* entity = nullptr;
 
 
-        entity = manager.CreateEntity(texture,sf::Vector2f(50.f, 50.f));
+        entity = manager.CreateEntity(texture, sf::Vector2f(50.f, 50.f));
         
-
 
         if (entity) {
             // Position aléatoire
             float randomX = static_cast<float>(std::rand() % 750);
             float randomY = static_cast<float>(std::rand() % 550);
             entity->SetPosition(randomX, randomY);
-
-            entity->SetSize(50.0f, 50.0f);
         }
     }
 }
@@ -86,7 +80,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(1, manager);
+    SpawnEntity(200, manager);
 
 
     while (window.isOpen())

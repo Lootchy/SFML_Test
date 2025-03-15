@@ -32,6 +32,9 @@
     <ClInclude Include="Entity.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Bebas-Regular.ttf">

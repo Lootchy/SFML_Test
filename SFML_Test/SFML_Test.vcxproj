@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="BounceBall.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Bebas-Regular.ttf" />

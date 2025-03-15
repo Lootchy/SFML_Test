@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include "TextureManager.h"
 
 // =================================================================================================
 // Entity Section
@@ -24,40 +25,38 @@ bool Entity::IsEntityDestroy() const
 
 void Entity::SetTexture(const std::string& filepath)
 {
+    // Récupère la texture depuis le TextureManager
+    sf::Texture texture = TextureManager::GetInstance().GetTexture(filepath);
 
-    if (!mTexture.loadFromFile(filepath, false)) {
-        std::cerr << "Error loading texture: " << filepath << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    mSprite.setTexture(mTexture);
+    mSprite.setTexture(texture);
 
     sf::Vector2f newSize = mSprite.getLocalBounds().size;
 
     sf::Vector2f scale(
-        newSize.x / static_cast<float>(mTexture.getSize().x),
-        newSize.y / static_cast<float>(mTexture.getSize().y)
+        newSize.x / static_cast<float>(texture.getSize().x),
+        newSize.y / static_cast<float>(texture.getSize().y)
     );
 
     mSprite.setScale(scale);
-    mSprite.setPosition(mSprite.getPosition());
 }
+
 
 void Entity::SetTexture(const sf::Texture& texture)
 {
-    mTexture = texture;
-    mSprite.setTexture(mTexture, true);
+    mTexture = &texture; 
+    mSprite.setTexture(*mTexture, true);
 
     sf::Vector2f newSize = mSprite.getLocalBounds().size;
 
     sf::Vector2f scale(
-        newSize.x / static_cast<float>(mTexture.getSize().x),
-        newSize.y / static_cast<float>(mTexture.getSize().y)
+        newSize.x / static_cast<float>(mTexture->getSize().x),
+        newSize.y / static_cast<float>(mTexture->getSize().y)
     );
 
     mSprite.setScale(scale);
-    mSprite.setPosition(mSprite.getPosition());
 }
+
+
 
 
 
@@ -76,7 +75,7 @@ void Entity::SetPosition(float x, float y)
 void Entity::SetSize(float x, float y)
 {
    
-    sf::Vector2f textureSize(mTexture.getSize());
+    sf::Vector2f textureSize(mSprite.getTexture().getSize());
     mSprite.setScale(sf::Vector2f(x / textureSize.x, y / textureSize.y));
 
 }
@@ -108,51 +107,69 @@ void Manager::Update(float deltaTime)
 
 void Manager::Draw(sf::RenderWindow& window)
 {
-    /*size_t rectangleCount = 0;
-    for (auto& e : mEntities) {
-        if (e->mShapeGeometry == Entity::ShapeType::RECTANGLE) {
-            rectangleCount++;
-        }
-    }
+    size_t spriteCount = mEntities.size();
 
-    sf::VertexArray vertexArray(sf::PrimitiveType::Triangles, rectangleCount * 6);
+    if (spriteCount == 0)
+        return;
+
+    sf::VertexArray vertexArray(sf::PrimitiveType::Triangles, spriteCount * 6);
+    sf::Texture* lastTexture = nullptr;
 
     int i = 0;
     for (auto& e : mEntities) {
-        if (e->mShapeGeometry == Entity::ShapeType::RECTANGLE) {
-            const sf::RectangleShape* rect = e->GetRectangleShape();
-            if (rect) {
-                const sf::Vector2f& pos = rect->getPosition();
-                const sf::Vector2f& size = rect->getSize();
-                const sf::Color& color = rect->getFillColor();
 
-                int baseIndex = i * 6;
-                sf::Vertex* v = &vertexArray[baseIndex];
+        const sf::Sprite& sprite = e->GetSprite();
+        const sf::Texture* texture = &sprite.getTexture();
 
-                v[0].position = pos;
-                v[1].position = pos + sf::Vector2f(size.x, 0);
-                v[2].position = pos + sf::Vector2f(size.x, size.y);
+        if (!texture)
+            continue;
 
-                v[3].position = pos;
-                v[4].position = pos + sf::Vector2f(size.x, size.y);
-                v[5].position = pos + sf::Vector2f(0, size.y);
+        if (lastTexture && lastTexture != texture) {
+            sf::RenderStates states;
+            states.texture = lastTexture;
+            window.draw(vertexArray, states);
 
-                for (int j = 0; j < 6; j++) {
-                    v[j].color = color;
-                }
-
-                i++;
-            }
+            vertexArray.clear();
+            vertexArray.resize(spriteCount * 6);
+            i = 0;
         }
+
+        lastTexture = const_cast<sf::Texture*>(texture);
+
+        sf::Vector2f pos = sprite.getPosition();
+        sf::Vector2f size(sprite.getGlobalBounds().size.x, sprite.getGlobalBounds().size.y);
+        sf::IntRect texRect = sprite.getTextureRect();
+        int baseIndex = i * 6;
+        sf::Vertex* v = &vertexArray[baseIndex];
+
+        // Assignation des positions
+        v[0].position = pos;
+        v[1].position = pos + sf::Vector2f(size.x, 0);
+        v[2].position = pos + sf::Vector2f(size.x, size.y);
+
+        v[3].position = pos;
+        v[4].position = pos + sf::Vector2f(size.x, size.y);
+        v[5].position = pos + sf::Vector2f(0, size.y);
+
+        // Assignation des coordonnées de texture
+        v[0].texCoords = sf::Vector2f(texRect.position.x, texRect.position.y);
+        v[1].texCoords = sf::Vector2f(texRect.position.x + texRect.size.x, texRect.position.y);
+        v[2].texCoords = sf::Vector2f(texRect.position.x + texRect.size.x, texRect.position.y + texRect.size.y);
+
+        v[3].texCoords = sf::Vector2f(texRect.position.x, texRect.position.y);
+        v[4].texCoords = sf::Vector2f(texRect.position.x + texRect.size.x, texRect.position.y + texRect.size.y);
+        v[5].texCoords = sf::Vector2f(texRect.position.x, texRect.position.y + texRect.size.y);
+
+        i++;
     }
-    window.draw(vertexArray);*/
 
-    for (auto& e : GetEntity()) {
-        if (e->HasSprite()) {
-            window.draw(e->GetSprite());
-        }
+    if (lastTexture) {
+        sf::RenderStates states;
+        states.texture = lastTexture;
+        window.draw(vertexArray, states);
     }
 }
+
 
 
 
