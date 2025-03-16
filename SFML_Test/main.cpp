@@ -13,8 +13,8 @@
 
 
 void SpawnEntity(size_t size, Manager& manager) {
-    TextureManager::loadTexture("dirt", "C:\\Users\\zian\\Downloads\\dirt.jpg");
-    TextureManager::loadTexture("base", "C:\\Users\\zian\\Downloads\\whitesquare.png");
+    TextureManager::loadTexture("dirt", "dirt.jpg");
+    TextureManager::loadTexture("base", "whitesquare.png");
     for (size_t i = 0; i < size; i++) {
         // Créer une entité avec la forme spécifiée
         Entity* entity = nullptr;
