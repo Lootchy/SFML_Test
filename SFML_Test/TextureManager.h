@@ -1,41 +1,34 @@
 #pragma once
-
 #include <SFML/Graphics.hpp>
-#include <unordered_map>
 #include <string>
+#include <map>
 
-class TextureManager {
+using namespace std;
+
+class TextureManager
+{
+    // The textures that are loaded
+    static map<string, sf::Texture*> textures;
+
+    // Manually keep track of the order in which textures were loaded, so you can get by index.
+    static std::vector<string> order;
+
+    // Constructor that is not used
+    TextureManager();
 public:
-    static TextureManager& GetInstance() {
-        static TextureManager instance;
-        return instance;
-    }
+    // Destructor which deletes the textures previously loaded
+    ~TextureManager();
 
-    const sf::Texture& GetTexture(const std::string& filepath) {
-        auto it = mTextures.find(filepath);
-        if (it != mTextures.end()) {
-            return it->second;
-        }
+    static int getLength();
 
-        sf::Texture& texture = mTextures[filepath]; // Création dans la map
-        if (!texture.loadFromFile(filepath)) {
-            std::cerr << "Error loading texture: " << filepath << std::endl;
-            exit(EXIT_FAILURE);
-        }
+    // Get texutre by name specified in loadTexture, or return null
+    static sf::Texture* getTexture(string name);
 
-        return texture;
-    }
-    void Clear() {
-        mTextures.clear();
-    }
+    // Get texutre by index in map, or return null
+    static sf::Texture* getTexture(int index);
 
-private:
-    std::unordered_map<std::string, sf::Texture> mTextures;
-
-
-    TextureManager() = default;
-    ~TextureManager() = default;
-    TextureManager(const TextureManager&) = delete;
-    TextureManager& operator=(const TextureManager&) = delete;
+    // Loads the texture and returns a pointer to it
+    // If it is already loaded, this function just returns it
+    // If it cannot find the file, returns NULL
+    static sf::Texture* loadTexture(string name, string path);
 };
-

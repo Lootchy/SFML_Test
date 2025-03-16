@@ -13,14 +13,14 @@
 
 
 void SpawnEntity(size_t size, Manager& manager) {
-    sf::Texture texture = TextureManager::GetInstance().GetTexture("C:\\Users\\zian\\Downloads\\dirt.jpg");
-
+    TextureManager::loadTexture("dirt", "C:\\Users\\zian\\Downloads\\dirt.jpg");
+    TextureManager::loadTexture("base", "C:\\Users\\zian\\Downloads\\whitesquare.png");
     for (size_t i = 0; i < size; i++) {
         // Créer une entité avec la forme spécifiée
         Entity* entity = nullptr;
 
 
-        entity = manager.CreateEntity(texture, sf::Vector2f(50.f, 50.f));
+        entity = manager.CreateEntity("dirt", sf::Vector2f(10.f, 10.f));
         
 
         if (entity) {
@@ -80,7 +80,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(200, manager);
+    SpawnEntity(200000, manager);
 
 
     while (window.isOpen())

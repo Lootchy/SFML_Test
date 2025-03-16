@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <optional>
+#include "TextureManager.h"
 
 class Entity
 {
@@ -12,15 +13,17 @@ private:
 	bool IsDestroy = false;
 	uint32_t mId;
 
-	const sf::Texture* mTexture = nullptr;
+	const sf::Texture* mTexture;
 	sf::Sprite mSprite;
 
 
 public:
-	Entity(const sf::Texture& texture)
-		: mId(sNextId++), mSprite(texture)
+	Entity(const std::string& filepath)
+		: mId(sNextId++),
+		mTexture(TextureManager::getTexture("base")),
+		mSprite(*mTexture)
 	{
-		SetTexture(texture);
+		SetTexture(filepath);
 	}
 
 
@@ -34,7 +37,7 @@ public:
 	void Destroy();
 	bool IsEntityDestroy()const;
 
-	void SetTexture(const std::string& filepath);
+	void SetTexture(const std::string& name);
 	void SetTexture(const sf::Texture& texture);
 	void SetColor(const sf::Color& color);
 	void SetPosition(float x, float y);
@@ -70,13 +73,13 @@ public:
 	void Refresh();
 
 	
-	Entity* CreateEntity(const sf::Texture& texture, sf::Vector2f size) {
+	Entity* CreateEntity(const std::string name, sf::Vector2f size) {
 		
 
 		Entity* entity = nullptr;
 
 		
-		entity = new Entity(texture); 
+		entity = new Entity(name);
 
 		if (entity) {
 			entity->SetSize(size.x, size.y);

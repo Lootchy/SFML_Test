@@ -138,6 +138,7 @@
     <ClCompile Include="BounceBall.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BounceBall.h" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="C:\Users\zian\Downloads\dirt.jpg" />
+    <Image Include="C:\Users\zian\Downloads\white square.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

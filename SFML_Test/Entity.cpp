@@ -23,21 +23,12 @@ bool Entity::IsEntityDestroy() const
 
 
 
-void Entity::SetTexture(const std::string& filepath)
+void Entity::SetTexture(const std::string& name)
 {
     // Récupère la texture depuis le TextureManager
-    sf::Texture texture = TextureManager::GetInstance().GetTexture(filepath);
+    sf::Texture* texture = TextureManager::getTexture(name);
 
-    mSprite.setTexture(texture);
-
-    sf::Vector2f newSize = mSprite.getLocalBounds().size;
-
-    sf::Vector2f scale(
-        newSize.x / static_cast<float>(texture.getSize().x),
-        newSize.y / static_cast<float>(texture.getSize().y)
-    );
-
-    mSprite.setScale(scale);
+    SetTexture(*texture);
 }
 
 
