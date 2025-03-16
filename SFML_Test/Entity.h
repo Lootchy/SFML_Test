@@ -2,13 +2,16 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <thread>
 #include "TextureManager.h"
+#include "QuadTree.h"
 
 class Entity
 {
 private:
 	static uint32_t sNextId;
 	bool IsDestroy = false;
+	bool HasCollision = false;
 	uint32_t mId;
 	std::string mTag;
 
@@ -30,13 +33,14 @@ public:
 
 	~Entity();
 
-	virtual void Init() {}
-	virtual void Update(float deltaTime) {}
-	virtual void OnCollision() {}
+	virtual void Init() {};
+	virtual void Update(float deltaTime) {};
+	virtual void OnCollision(Entity* collidedWith) {};
 
 	void Destroy();
 	bool IsEntityDestroy()const;
 	bool IsColliding(Entity* entity)const;
+	void CanCollide(bool coll) { HasCollision = coll; }
 
 	void SetTexture(const std::string& name);
 	void SetTexture(const sf::Texture& texture);
@@ -64,8 +68,11 @@ class Manager
 {
 private:
 	std::vector<Entity*> mEntities;
+	Quadtree quadtree;
+	const int numThreads = std::thread::hardware_concurrency();
 
 public:
+	Manager() : quadtree(0, 0, 800, 600) {}
 
 	~Manager();
 
@@ -94,7 +101,7 @@ public:
 
 
 
-
+	static void ProcessCollisions(std::vector<Entity*>& entities, Quadtree& quadtree, int start, int end);
 	std::vector<Entity*>& GetEntity() { return mEntities; }
 };
 

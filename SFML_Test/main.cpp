@@ -69,6 +69,11 @@ int main()
     TextureManager::loadTexture("base", "whitesquare.png");
     Manager manager;
     Entity* entity = manager.CreateEntity("dirt", sf::Vector2f(50.0f, 50.0f));
+    entity->CanCollide(true);
+    
+    Entity* entity2 = manager.CreateEntity("dirt", sf::Vector2f(50.0f, 50.0f));
+    entity2->SetPosition(100, 0);
+    entity2->CanCollide(true);
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
@@ -83,7 +88,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(1, manager);
+    SpawnEntity(10000, manager);
 
 
     while (window.isOpen())

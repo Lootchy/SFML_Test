@@ -1,5 +1,6 @@
-#include "Entity.h"
+ï»¿#include "Entity.h"
 #include "TextureManager.h"
+#include "Quadtree.h"
 
 // =================================================================================================
 // Entity Section
@@ -41,10 +42,9 @@ bool Entity::IsColliding(Entity* entity) const
 
 
 
-
 void Entity::SetTexture(const std::string& name)
 {
-    // Récupère la texture depuis le TextureManager
+    // RÃ©cupÃ¨re la texture depuis le TextureManager
     sf::Texture* texture = TextureManager::getTexture(name);
 
     SetTexture(*texture);
@@ -108,12 +108,38 @@ Manager::~Manager()
 
 void Manager::Update(float deltaTime)
 {
-	for (auto& e : mEntities) {
-		e->Update(deltaTime);
-	}
+    for (auto& e : mEntities) {
+        e->Update(deltaTime);
+    }
+    for (auto& e : mEntities) {
+        quadtree.UpdateEntity(e);
+    }
 
-	Refresh();
+    quadtree.Clear();
+
+    for (auto& e : mEntities) {
+        if (e->HasCollision) {
+            quadtree.Insert(e);
+        }
+    }
+
+    std::vector<std::thread> threads;
+    int entitiesPerThread = mEntities.size() / numThreads;
+
+    for (int i = 0; i < numThreads; ++i) {
+        int start = i * entitiesPerThread;
+        int end = (i == numThreads - 1) ? mEntities.size() : start + entitiesPerThread;
+        threads.emplace_back(ProcessCollisions, std::ref(mEntities), std::ref(quadtree), start, end);
+    }
+
+    // Attente de tous les threads
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    Refresh();
 }
+
 
 void Manager::Draw(sf::RenderWindow& window)
 {
@@ -161,7 +187,7 @@ void Manager::Draw(sf::RenderWindow& window)
         v[4].position = pos + sf::Vector2f(size.x, size.y);
         v[5].position = pos + sf::Vector2f(0, size.y);
 
-        // Assignation des coordonnées de texture
+        // Assignation des coordonnÃ©es de texture
         v[0].texCoords = sf::Vector2f(texRect.position.x, texRect.position.y);
         v[1].texCoords = sf::Vector2f(texRect.position.x + texRect.size.x, texRect.position.y);
         v[2].texCoords = sf::Vector2f(texRect.position.x + texRect.size.x, texRect.position.y + texRect.size.y);
@@ -197,6 +223,23 @@ void Manager::Refresh()
 
     
     mEntities.erase(it, mEntities.end());
+}
+
+void Manager::ProcessCollisions(std::vector<Entity*>& entities, Quadtree& quadtree, int start, int end)
+{
+    for (int i = start; i < end; ++i) {
+        Entity* e = entities[i];
+        if (!e->HasCollision) continue;
+
+        auto candidates = quadtree.Query(e);
+        for (auto candidate : candidates) {
+            if (e != candidate && e->IsColliding(candidate)) {
+                std::cout << "Collision " << std::endl;
+                e->OnCollision(candidate);
+                candidate->OnCollision(e);
+            }
+        }
+    }
 }
 
 

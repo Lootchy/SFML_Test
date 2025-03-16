@@ -138,11 +138,13 @@
     <ClCompile Include="BounceBall.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BounceBall.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
