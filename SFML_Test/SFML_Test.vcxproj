@@ -146,6 +146,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="ThreadPool.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Bebas-Regular.ttf" />

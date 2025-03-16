@@ -1,4 +1,5 @@
-﻿#include "Entity.h"
+﻿#include <omp.h>
+#include "Entity.h"
 #include "TextureManager.h"
 #include "Quadtree.h"
 
@@ -106,8 +107,7 @@ Manager::~Manager()
     mEntities.clear();
 }
 
-void Manager::Update(float deltaTime)
-{
+void Manager::Update(float deltaTime) {
     for (auto& e : mEntities) {
         e->Update(deltaTime);
     }
@@ -123,19 +123,24 @@ void Manager::Update(float deltaTime)
         }
     }
 
-    std::vector<std::thread> threads;
-    int entitiesPerThread = mEntities.size() / numThreads;
 
-    for (int i = 0; i < numThreads; ++i) {
-        int start = i * entitiesPerThread;
-        int end = (i == numThreads - 1) ? mEntities.size() : start + entitiesPerThread;
-        threads.emplace_back(ProcessCollisions, std::ref(mEntities), std::ref(quadtree), start, end);
+#pragma omp parallel for
+    for (int i = 0; i < mEntities.size(); ++i) {
+        Entity* e = mEntities[i];
+        if (!e->HasCollision) continue;
+
+        auto candidates = quadtree.Query(e);
+        for (auto candidate : candidates) {
+            if (e != candidate && e->IsColliding(candidate)) {
+                {
+                    e->OnCollision(candidate);
+                    candidate->OnCollision(e);
+                }
+            }
+        }
     }
 
-    // Attente de tous les threads
-    for (auto& t : threads) {
-        t.join();
-    }
+    //std::cout << "Nombre de collisions détectées : " << count << std::endl;
 
     Refresh();
 }
@@ -234,7 +239,7 @@ void Manager::ProcessCollisions(std::vector<Entity*>& entities, Quadtree& quadtr
         auto candidates = quadtree.Query(e);
         for (auto candidate : candidates) {
             if (e != candidate && e->IsColliding(candidate)) {
-                std::cout << "Collision " << std::endl;
+                //std::cout << "Collision " << std::endl;
                 e->OnCollision(candidate);
                 candidate->OnCollision(e);
             }

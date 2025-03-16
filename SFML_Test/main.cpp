@@ -88,7 +88,7 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(10000, manager);
+    SpawnEntity(100, manager);
 
 
     while (window.isOpen())
