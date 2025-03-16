@@ -11,7 +11,7 @@ Quadtree::~Quadtree()
 void Quadtree::Insert(Entity* entity)
 {
     if (!Contains(entity)) {
-        return; // L'entité n'est pas dans ce nœud
+        return;
     }
 
     if (entities.size() < CAPACITY || level >= MAX_LEVELS) {
@@ -35,7 +35,7 @@ std::vector<Entity*> Quadtree::Query(Entity* entity)
     if (!Contains(entity)) return result;
 
     for (auto e : entities) {
-        if (e != entity && entity->IsColliding(e)) { // On filtre directement
+        if (e != entity && entity->IsColliding(e)) { 
             result.push_back(e);
         }
     }

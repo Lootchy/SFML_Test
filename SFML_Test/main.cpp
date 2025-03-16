@@ -10,6 +10,8 @@
 #include "BounceBall.h"
 #include "Entity.h"
 #include "TextureManager.h"
+#include "Window.h"
+
 
 
 void SpawnEntity(size_t size, Manager& manager) {
@@ -65,20 +67,20 @@ void Update(std::deque<BounceBall>& ball, sf::VertexArray& particles) {
 
 int main()
 {
+    Window window;
     TextureManager::loadTexture("dirt", "dirt.jpg");
     TextureManager::loadTexture("base", "whitesquare.png");
     Manager manager;
-    Entity* entity = manager.CreateEntity("dirt", sf::Vector2f(50.0f, 50.0f));
+    Entity* entity = manager.CreateEntity("base", sf::Vector2f(50.0f, 50.0f));
     entity->CanCollide(true);
     
-    Entity* entity2 = manager.CreateEntity("dirt", sf::Vector2f(50.0f, 50.0f));
+    Entity* entity2 = manager.CreateEntity("base", sf::Vector2f(50.0f, 50.0f));
     entity2->SetPosition(100, 0);
     entity2->CanCollide(true);
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "caca");
-    sf::Clock clock;
+    window.CreateWindow( 800, 600, "caca");
     sf::Font font;
     font.openFromFile("Bebas-Regular.ttf");
 
@@ -88,27 +90,24 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(100, manager);
+    SpawnEntity(5000, manager);
 
 
-    while (window.isOpen())
+    while (window.IsOpen())
     {
-        
-        float deltaTime = clock.restart().asSeconds();
+        window.SetDeltaTime();
+        float deltaTime = window.GetDeltaTime();
         entity->SetPosition(entity->GetPosition().x + 100 * deltaTime, entity->GetPosition().y);
 
         manager.Update(deltaTime);
-        
-        int fps = static_cast<int>(1.0f / deltaTime);
+        int fps = window.GetFPS();
 
         fpsText.setString("FPS: " + std::to_string(fps));
 
-        window.clear();
-        manager.Draw(window);
-        window.draw(fpsText);
+        window.Clear();
+        manager.Draw(window.GetWindow());
+        window.Draw(fpsText);
 
-        window.display();
-
- 
+        window.Display();
     }
 }

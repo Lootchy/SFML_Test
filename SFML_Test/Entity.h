@@ -11,7 +11,7 @@ class Entity
 private:
 	static uint32_t sNextId;
 	bool IsDestroy = false;
-	bool HasCollision = false;
+	bool HasCollision = true;
 	uint32_t mId;
 	std::string mTag;
 

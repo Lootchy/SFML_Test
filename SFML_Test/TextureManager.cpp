@@ -15,8 +15,6 @@ int TextureManager::getLength() {
 
 sf::Texture* TextureManager::getTexture(string name)
 {
-
-
     if (textures.find(name) != textures.end()) {
         return textures[name];
     }
@@ -57,8 +55,6 @@ sf::Texture* TextureManager::loadTexture(string name, string path)
 
 TextureManager::~TextureManager()
 {
-
-    
     sf::Texture* texture;
     map<string, sf::Texture*>::iterator iter = textures.begin();
     while (iter != textures.end())

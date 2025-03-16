@@ -140,6 +140,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BounceBall.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Bebas-Regular.ttf" />

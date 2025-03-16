@@ -1,7 +1,6 @@
 ﻿#include <omp.h>
 #include "Entity.h"
 #include "TextureManager.h"
-#include "Quadtree.h"
 
 // =================================================================================================
 // Entity Section
@@ -45,7 +44,6 @@ bool Entity::IsColliding(Entity* entity) const
 
 void Entity::SetTexture(const std::string& name)
 {
-    // Récupère la texture depuis le TextureManager
     sf::Texture* texture = TextureManager::getTexture(name);
 
     SetTexture(*texture);
@@ -66,11 +64,6 @@ void Entity::SetTexture(const sf::Texture& texture)
 
     mSprite.setScale(scale);
 }
-
-
-
-
-
 
 
 void Entity::SetColor(const sf::Color& color) 
