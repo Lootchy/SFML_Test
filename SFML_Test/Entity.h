@@ -6,8 +6,13 @@
 #include "TextureManager.h"
 #include "QuadTree.h"
 
+class Manager;
+
 class Entity
 {
+protected:
+	Manager* mManager;
+
 private:
 	static uint32_t sNextId;
 	bool IsDestroy = false;
@@ -20,12 +25,13 @@ private:
 
 
 public:
-	Entity(const std::string& filepath)
+	Entity(Manager* manager, const std::string& textureName)
 		: mId(sNextId++),
 		mTexture(TextureManager::getTexture("base")),
-		mSprite(*mTexture)
+		mSprite(*mTexture),
+		mManager(manager)
 	{
-		SetTexture(filepath);
+		SetTexture(textureName);
 	}
 
 
@@ -72,7 +78,7 @@ private:
 	const int numThreads = std::thread::hardware_concurrency();
 
 public:
-	Manager() : quadtree(0, 0, 800, 600) {}
+	Manager(float x, float y) : quadtree(0, 0, x, y) {}
 
 	~Manager();
 
@@ -83,12 +89,8 @@ public:
 
 	
 	Entity* CreateEntity(const std::string name, sf::Vector2f size) {
-		
 
-		Entity* entity = nullptr;
-
-		
-		entity = new Entity(name);
+		Entity* entity = new Entity(this, name);
 
 		if (entity) {
 			entity->SetSize(size.x, size.y);

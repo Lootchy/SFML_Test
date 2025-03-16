@@ -1,7 +1,9 @@
-
 #include "Window.h"
+#include "Entity.h"
 
-Window::Window()
+
+
+Window::Window(Manager* manager) : mManager(manager)
 {
 }
 
@@ -19,11 +21,28 @@ void Window::CreateWindow(int x, int y, const std::string& windowName)
 	if (!mWindow)
 		mWindow = new sf::RenderWindow();
 	mWindow->create(sf::VideoMode(sf::Vector2u(x, y)), windowName);
+	mWidth = x;
+	mHeight = y;
 }
 
 void Window::Clear()
 {
 	mWindow->clear();
+}
+
+void Window::RunLoop()
+{
+	while (IsOpen())
+	{
+
+		mManager->Update(GetDeltaTime());
+
+		Clear();
+		mManager->Draw(*mWindow);
+
+
+		Update();
+	}
 }
 
 void Window::Draw(const sf::Drawable& drawable)
@@ -32,9 +51,10 @@ void Window::Draw(const sf::Drawable& drawable)
 }
 
 
-void Window::Display()
+void Window::Update()
 {
 	mWindow->display();
+	UpdateDeltaTime();
 }
 
 const int& Window::GetFPS()
@@ -43,7 +63,7 @@ const int& Window::GetFPS()
 	return mFPS;
 }
 
-void Window::SetDeltaTime()
+void Window::UpdateDeltaTime()
 {
 	 mDeltaTime = mClock.restart().asSeconds();
 }

@@ -11,6 +11,7 @@
 #include "Entity.h"
 #include "TextureManager.h"
 #include "Window.h"
+#include "Player.h"
 
 
 
@@ -67,16 +68,11 @@ void Update(std::deque<BounceBall>& ball, sf::VertexArray& particles) {
 
 int main()
 {
-    Window window;
+    Manager manager(800, 600);
+    Window window(&manager);
     TextureManager::loadTexture("dirt", "dirt.jpg");
     TextureManager::loadTexture("base", "whitesquare.png");
-    Manager manager;
-    Entity* entity = manager.CreateEntity("base", sf::Vector2f(50.0f, 50.0f));
-    entity->CanCollide(true);
-    
-    Entity* entity2 = manager.CreateEntity("base", sf::Vector2f(50.0f, 50.0f));
-    entity2->SetPosition(100, 0);
-    entity2->CanCollide(true);
+    Player* player;
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
@@ -92,22 +88,5 @@ int main()
 
     SpawnEntity(5000, manager);
 
-
-    while (window.IsOpen())
-    {
-        window.SetDeltaTime();
-        float deltaTime = window.GetDeltaTime();
-        entity->SetPosition(entity->GetPosition().x + 100 * deltaTime, entity->GetPosition().y);
-
-        manager.Update(deltaTime);
-        int fps = window.GetFPS();
-
-        fpsText.setString("FPS: " + std::to_string(fps));
-
-        window.Clear();
-        manager.Draw(window.GetWindow());
-        window.Draw(fpsText);
-
-        window.Display();
-    }
+    window.RunLoop();
 }
