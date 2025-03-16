@@ -2,16 +2,15 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <optional>
 #include "TextureManager.h"
 
 class Entity
 {
 private:
 	static uint32_t sNextId;
-
 	bool IsDestroy = false;
 	uint32_t mId;
+	std::string mTag;
 
 	const sf::Texture* mTexture;
 	sf::Sprite mSprite;
@@ -33,25 +32,28 @@ public:
 
 	virtual void Init() {}
 	virtual void Update(float deltaTime) {}
+	virtual void OnCollision() {}
 
 	void Destroy();
 	bool IsEntityDestroy()const;
+	bool IsColliding(Entity* entity)const;
 
 	void SetTexture(const std::string& name);
 	void SetTexture(const sf::Texture& texture);
 	void SetColor(const sf::Color& color);
 	void SetPosition(float x, float y);
 	void SetSize(float x, float y);
+	void SetTag(const std::string& tag) { mTag = tag; }
 
 
 	const sf::Texture& GetTexture() const { return *mTexture; }
-	
-
 	sf::Sprite& GetSprite() { return mSprite; }
-
+	sf::Vector2f GetSize() const {
+		return mSprite.getGlobalBounds().size;
+	}
 	sf::Vector2f GetPosition()const { return mSprite.getPosition(); }
-
 	uint32_t GetEntityId()const { return mId; }
+	const std::string& GetTag() { return mTag; }
 
 	friend class Manager;
 };

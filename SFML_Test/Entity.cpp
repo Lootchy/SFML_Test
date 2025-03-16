@@ -8,6 +8,7 @@ uint32_t Entity::sNextId = 1;
 
 Entity::~Entity()
 {
+    mTexture = nullptr;
 }
 
 void Entity::Destroy()
@@ -18,6 +19,24 @@ void Entity::Destroy()
 bool Entity::IsEntityDestroy() const
 {
     return IsDestroy;
+}
+
+bool Entity::IsColliding(Entity* entity) const
+{
+    sf::Vector2f CollidingEntityPos = entity->GetPosition();
+    sf::Vector2f CollidingEntitySize = entity->GetSize();
+    sf::Vector2f EntityPos = GetPosition();
+    sf::Vector2f EntitySize = GetSize();
+    if (EntityPos.x < CollidingEntityPos.x + CollidingEntitySize.x &&
+        EntityPos.x + EntitySize.x > CollidingEntityPos.x &&
+        EntityPos.y < CollidingEntityPos.y + CollidingEntitySize.y &&
+        EntityPos.y + EntitySize.y > CollidingEntityPos.y)
+
+    {
+        return true;
+    }
+
+    return false;
 }
 
 

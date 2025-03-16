@@ -13,8 +13,7 @@
 
 
 void SpawnEntity(size_t size, Manager& manager) {
-    TextureManager::loadTexture("dirt", "dirt.jpg");
-    TextureManager::loadTexture("base", "whitesquare.png");
+    
     for (size_t i = 0; i < size; i++) {
         // Créer une entité avec la forme spécifiée
         Entity* entity = nullptr;
@@ -66,7 +65,11 @@ void Update(std::deque<BounceBall>& ball, sf::VertexArray& particles) {
 
 int main()
 {
+    TextureManager::loadTexture("dirt", "dirt.jpg");
+    TextureManager::loadTexture("base", "whitesquare.png");
     Manager manager;
+    Entity* entity = manager.CreateEntity("dirt", sf::Vector2f(50.0f, 50.0f));
+
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "caca");
@@ -80,12 +83,14 @@ int main()
     fpsText.setFillColor(sf::Color::White); 
     fpsText.setPosition(sf::Vector2f(10.f, 10.f)); 
 
-    SpawnEntity(100, manager);
+    SpawnEntity(1, manager);
 
 
     while (window.isOpen())
     {
+        
         float deltaTime = clock.restart().asSeconds();
+        entity->SetPosition(entity->GetPosition().x + 100 * deltaTime, entity->GetPosition().y);
 
         manager.Update(deltaTime);
         
