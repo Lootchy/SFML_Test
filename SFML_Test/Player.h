@@ -4,11 +4,10 @@
 class Player : public Entity
 {
 private:
-	Entity* mPlayer;
 
 public:
-	Player(Manager* manager)
-		: Entity(manager, "base")
+	Player(Manager* manager, const std::string& name)
+		: Entity(manager, name)
 	{
 	}
 	void Init()override;

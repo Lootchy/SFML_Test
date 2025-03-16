@@ -25,13 +25,13 @@ private:
 
 
 public:
-	Entity(Manager* manager, const std::string& textureName)
-		: mId(sNextId++),
+	Entity(Manager* manager, const std::string& filepath)
+		: mManager(manager),
+		mId(sNextId++),
 		mTexture(TextureManager::getTexture("base")),
-		mSprite(*mTexture),
-		mManager(manager)
+		mSprite(*mTexture)
 	{
-		SetTexture(textureName);
+		SetTexture(filepath);
 	}
 
 
@@ -54,6 +54,7 @@ public:
 	void SetPosition(float x, float y);
 	void SetSize(float x, float y);
 	void SetTag(const std::string& tag) { mTag = tag; }
+	void SetManager(Manager* manager) { mManager = manager; }
 
 
 	const sf::Texture& GetTexture() const { return *mTexture; }
@@ -87,19 +88,23 @@ public:
 
 	void Refresh();
 
-	
-	Entity* CreateEntity(const std::string name, sf::Vector2f size) {
+	template<typename T>
+	T* CreateEntity(const std::string name, sf::Vector2f size, Manager* manager) {
 
-		Entity* entity = new Entity(this, name);
+		T* newEntity = new T(manager, name);
 
-		if (entity) {
-			entity->SetSize(size.x, size.y);
-			entity->Init();
-			mEntities.emplace_back(entity);
+		if (!newEntity) {
+			std::cerr << "Erreur: newEntity est nullptr après allocation !" << std::endl;
+			return nullptr;
 		}
+		Entity* entity = newEntity;
+		entity->SetSize(size.x, size.y);
+		entity->Init();
 
-		return entity;
+		mEntities.emplace_back(newEntity);
+		return newEntity;
 	}
+
 
 
 

@@ -22,7 +22,7 @@ void SpawnEntity(size_t size, Manager& manager) {
         Entity* entity = nullptr;
 
 
-        entity = manager.CreateEntity("dirt", sf::Vector2f(10.f, 10.f));
+        entity = manager.CreateEntity<Player>("dirt", sf::Vector2f(10.f, 10.f), &manager);
         
 
         if (entity) {
@@ -72,7 +72,7 @@ int main()
     Window window(&manager);
     TextureManager::loadTexture("dirt", "dirt.jpg");
     TextureManager::loadTexture("base", "whitesquare.png");
-    Player* player;
+    Player* player = manager.CreateEntity<Player>("base", sf::Vector2f(10.f, 10.f), &manager);
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
