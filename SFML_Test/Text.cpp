@@ -2,7 +2,7 @@
 
 
 
-Text::Text(const std::string& fontPath)
+Text::Text(const std::string& fontPath) : mText(mFont)
 {
 	if (!mFont.openFromFile(fontPath))
 	{
@@ -15,7 +15,7 @@ Text::Text(const std::string& fontPath)
 
 void Text::SetFont(std::string filepath)
 {
-	if (mFont.openFromFile(filepath)) {
+	if (!mFont.openFromFile(filepath)) {
 		throw std::runtime_error("Impossible de charger la police : " + filepath);
 	}
 
