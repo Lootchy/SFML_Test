@@ -2,7 +2,6 @@
 
 void Player::Init()
 {
-	
 	CanCollide(false);
 }
 

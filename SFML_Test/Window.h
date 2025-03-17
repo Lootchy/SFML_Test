@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
+#include "Text.h"
 
 
 class Manager;
@@ -10,13 +11,14 @@ private:
 	sf::RenderWindow* mWindow = nullptr;
 	sf::Clock mClock;
 
-	float mWidth;
-	float mHeight;
+	float mWidth = 0;
+	float mHeight = 0;
 
-	float mDeltaTime;
-	int mFPS;
+	float mDeltaTime = 0;
+	int mFPS = 0;
 
-	Manager* mManager;
+	Manager* mManager = nullptr;
+	TextManager mTextManager;
 
 public:
 	Window(Manager* manager);
@@ -34,6 +36,7 @@ public:
 	const float& GetDeltaTime() { return mDeltaTime; }
 	const int& GetFPS();
 	sf::RenderWindow& GetWindow() { return *mWindow; }
+	TextManager& GetTextManager() { return mTextManager; }
 
 	void Clear();
 	void SetVSync(bool enable){ mWindow->setVerticalSyncEnabled(enable); }

@@ -30,20 +30,21 @@ void Window::Clear()
 	mWindow->clear();
 }
 
+
 void Window::RunLoop()
 {
 	while (IsOpen())
 	{
-
 		mManager->Update(GetDeltaTime());
-
+		mTextManager.Update();
 		Clear();
+
 		mManager->Draw(*mWindow);
-
-
+		mTextManager.Draw(GetWindow());
 		Update();
 	}
 }
+
 
 void Window::Draw(const sf::Drawable& drawable)
 {
